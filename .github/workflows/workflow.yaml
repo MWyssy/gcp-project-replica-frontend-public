@@ -8,20 +8,18 @@ on:
 jobs:
   Build-and-Sync:
     runs-on: ubuntu-latest
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_REGION_NAME: eu-west-2
     steps:
       - uses: actions/checkout@v3
       - name: Setup
         run: npm install
       - name: Build
         run: npm run build
-      - name: Copy to S3
-        run: |
-          ls
-          aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-          aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-          aws configure set region $AWS_REGION_NAME
-          aws s3 sync ./dist s3://ce-tfotc-frontend-host
+      - uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --acl public-read --follow-symlinks --delete
+        env:
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION_NAME: eu-west-2
+          SOURCE_DIR: './dist'
