@@ -22,4 +22,4 @@ jobs:
       - name: Copy to S3
         run: |
           aws s3 rm s3://ce-tfotc-frontend-host --recursive
-          aws s3 sync ./dist s3://ce-tfotc-frontend-host
+          aws s3 sync ./dist s3://ce-tfotc-frontend-host --cache-control "max-age=300"
