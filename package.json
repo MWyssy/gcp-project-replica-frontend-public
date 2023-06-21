@@ -8,7 +8,7 @@
     "dev": "vite --host",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest run services"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.4.6",
