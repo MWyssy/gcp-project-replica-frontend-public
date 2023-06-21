@@ -22,4 +22,8 @@ npm start
 
 ## Running the tests
 
-Yeah erm....we didn't create any just yet 🙈
+Tests are handled by Vitest. We (Cloud engineering team) have created one _very_ simple test to check that the pipeline functions as it should. This means that tests can now be added in, and will be automatically run as part of the deployment pipeline upon pushing to the main branch.
+
+To run tests locally, use `npm test`.
+
+While it is not recommended to push to the main branch while any of your tests are failing, the pipeline is set up so that if tests fail, the new version will not be deployed and hosted.
