@@ -15,6 +15,7 @@ jobs:
       - name: Test
         run: npm test
   Build-and-Sync:
+    needs: Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
