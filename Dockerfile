@@ -1,18 +1,26 @@
 FROM node:alpine as build
 
-COPY package.json ./
+WORKDIR /app
+
+COPY package.json /app
 
 RUN npm install
 
-COPY . ./
+COPY . /app
 
 RUN npm run build
 
 
-FROM nginx:1.21.0-alpine
+FROM ubuntu
 
-COPY --from=build /dist /usr/share/nginx/html
+RUN apt-get update
 
-COPY --from=build nginx.conf /etc/nginx
+RUN apt-get install nginx -y
 
-ENTRYPOINT ["nginx", "-g", "daemon off;"]
+COPY --from=build /app/dist /var/www/html/
+
+COPY --from=build /app/nginx.conf /etc/nginx/
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
