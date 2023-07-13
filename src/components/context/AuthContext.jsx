@@ -15,6 +15,7 @@ const AuthProvider = ({ children }) => {
 
     const setCustomerFromToken = () => {
         let token = localStorage.getItem("access_token");
+        console.log("Token from local storage:", token);
         if (token) {
             token = jwtDecode(token);
             setCustomer({
