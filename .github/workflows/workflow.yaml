@@ -28,12 +28,8 @@ jobs:
       - id: checkout
         name: Checkout
         uses: actions/checkout@v3
-
-      - uses: actions/checkout@v3
-      - name: Setup
-        run: npm install
-      - name: Build
-        run: npm run build
+        env:
+          CI: false
 
       - id: auth
         name: Authenticate with Google Cloud
