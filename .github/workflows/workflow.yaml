@@ -16,6 +16,7 @@ jobs:
         run: npm test
   Build-and-Push:
     needs: Test
+    
     name: Tagged Docker release to Google Artifact Registry
     runs-on: ubuntu-latest
 
@@ -27,6 +28,12 @@ jobs:
       - id: checkout
         name: Checkout
         uses: actions/checkout@v3
+
+      - uses: actions/checkout@v3
+      - name: Setup
+        run: npm install
+      - name: Build
+        run: npm run build
 
       - id: auth
         name: Authenticate with Google Cloud
