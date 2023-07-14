@@ -14,21 +14,41 @@ jobs:
         run: npm install
       - name: Test
         run: npm test
-  Build-and-Sync:
+  Build-and-Push:
     needs: Test
+    name: Tagged Docker release to Google Artifact Registry
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
     steps:
-      - uses: actions/checkout@v3
-      - name: Setup
-        run: npm install
-      - name: Build
-        run: npm run build
-      - uses: aws-actions/configure-aws-credentials@v2
+      - id: checkout
+        name: Checkout
+        uses: actions/checkout@v3
+
+      - id: auth
+        name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v0
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-west-2
-      - name: Copy to S3
-        run: |
-          aws s3 rm s3://ce-tfotc-frontend-host --recursive
-          aws s3 sync ./dist s3://ce-tfotc-frontend-host --cache-control "max-age=300"
+          token_format: access_token
+          workload_identity_provider: projects/71612204665/locations/global/workloadIdentityPools/project-pool/providers/github-access
+          service_account: gcp-pr-sa@gcp-project-replica-391115.iam.gserviceaccount.com
+          access_token_lifetime: 300s
+
+      - name: Login to Artifact Registry
+        uses: docker/login-action@v1
+        with:
+          registry: europe-west2-docker.pkg.dev
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
+
+      - id: docker-push-tagged
+        name: Tag Docker image and push to Google Artifact Registry
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: |
+             europe-west2-docker.pkg.dev/gcp-project-replica-391115/gcp-pr-container-reg-fe/gcp-pr-fe:2.${{ github.run_number }}
+             europe-west2-docker.pkg.dev/gcp-project-replica-391115/gcp-pr-container-reg-fe/gcp-pr-fe:latest
